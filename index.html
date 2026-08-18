@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Harian Teks Argumentasi Kelas XI - SMA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+            .card-print { border: 1px solid #ccc; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-indigo-700 text-white shadow-lg no-print">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-600 rounded-lg">
+                    <i class="fa-solid me-1 fa-file-pen text-xl text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold leading-tight">Asesmen Teks Argumentasi</h1>
+                    <p class="text-xs text-indigo-200">Bahasa Indonesia SMA Kelas XI</p>
+                </div>
+            </div>
+            <div id="header-timer" class="hidden items-center bg-indigo-800 px-3 py-1.5 rounded-full text-amber-300 font-mono font-bold text-sm">
+                <i class="fa-regular fa-clock mr-2"></i><span id="timer-display">45:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto w-full px-4 py-6 flex-grow">
+
+        <!-- 1. HALAMAN IDENTITAS SISWA (START SCREEN) -->
+        <section id="screen-start" class="max-w-xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-100 mt-4">
+            <div class="text-center mb-6">
+                <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Ujian Evaluasi</span>
+                <h2 class="text-2xl font-bold text-slate-800 mt-2">Data Peserta Didik</h2>
+                <p class="text-sm text-slate-500 mt-1">Silakan isi identitas Anda sebelum memulai ujian Teks Argumentasi.</p>
+            </div>
+
+            <form id="form-identity" onsubmit="startExam(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input type="text" id="student-name" required placeholder="Contoh: Ahmad Rizky" 
+                           class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Kelas <span class="text-red-500">*</span></label>
+                        <input type="text" id="student-class" required placeholder="Contoh: XI IPA 1 / XI Merdeka 2" 
+                               class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">No. Absen <span class="text-red-500">*</span></label>
+                        <input type="number" id="student-number" min="1" max="60" required placeholder="1-60" 
+                               class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-xs text-indigo-900 space-y-1">
+                    <p class="font-semibold text-indigo-950 mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Ketentuan Ujian:</p>
+                    <p>• Jumlah Soal: 20 Soal Pilihan Ganda (A, B, C, D, E)</p>
+                    <p>• Alokasi Waktu: 45 Menit</p>
+                    <p>• Hasil akhir & kunci pembahasan akan ditampilkan secara otomatis setelah tombol Selesai diklik.</p>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-md transition duration-200 flex items-center justify-center space-x-2">
+                    <span>Mulai Kerjakan Soal</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </section>
+
+        <!-- 2. HALAMAN SOAL UJIAN -->
+        <section id="screen-quiz" class="hidden grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Kolom Utama: Soal -->
+            <div class="lg:col-span-3 space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100">
+                    <!-- Navigasi Atas Soal -->
+                    <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-100">
+                        <span class="font-bold text-indigo-700 text-lg" id="question-number-title">Soal No. 1</span>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md font-medium">Bobot: 5 Poin</span>
+                    </div>
+
+                    <!-- Teks Soal & Stimulus -->
+                    <div id="question-content" class="text-slate-800 leading-relaxed text-sm md:text-base space-y-3">
+                        <!-- Content via JS -->
+                    </div>
+
+                    <!-- Pilihan Jawaban -->
+                    <div id="options-container" class="mt-6 space-y-3">
+                        <!-- Options via JS -->
+                    </div>
+
+                    <!-- Tombol Navigasi Soal -->
+                    <div class="flex justify-between items-center pt-6 mt-6 border-t border-slate-100">
+                        <button id="btn-prev" onclick="changeQuestion(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-lg transition disabled:opacity-40">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Sebelumnya
+                        </button>
+                        <button id="btn-next" onclick="changeQuestion(1)" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow transition">
+                            Berikutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom Samping: Peta Nomor Soal -->
+            <div class="space-y-4">
+                <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 sticky top-4">
+                    <h3 class="font-bold text-slate-800 text-sm mb-3 pb-2 border-b border-slate-100 flex justify-between items-center">
+                        <span>Navigasi Soal</span>
+                        <span id="answered-count-badge" class="text-xs font-normal text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">0/20 Terjawab</span>
+                    </h3>
+                    
+                    <div id="question-grid" class="grid grid-cols-5 gap-2">
+                        <!-- Grid 1-20 via JS -->
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-500">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3.5 h-3.5 bg-indigo-600 rounded"></div>
+                            <span>Soal Sedang Dibuka</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3.5 h-3.5 bg-emerald-500 rounded"></div>
+                            <span>Sudah Dijawab</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3.5 h-3.5 bg-slate-200 rounded"></div>
+                            <span>Belum Dijawab</span>
+                        </div>
+                    </div>
+
+                    <button onclick="confirmFinish()" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl shadow transition text-sm flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>Selesaikan Ujian</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. HALAMAN HASIL & REKAP KUNCI JAWABAN -->
+        <section id="screen-result" class="hidden space-y-6 max-w-4xl mx-auto">
+            <!-- Card Skor -->
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-100 text-center relative overflow-hidden card-print">
+                <div class="no-print absolute top-4 right-4">
+                    <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak Laporan</span>
+                    </button>
+                </div>
+
+                <span class="inline-block p-3 bg-indigo-50 rounded-full text-indigo-600 mb-2">
+                    <i class="fa-solid fa-trophy text-3xl"></i>
+                </span>
+                <h2 class="text-2xl font-bold text-slate-800">Laporan Hasil Ujian</h2>
+                <p class="text-xs text-slate-500">Teks Argumentasi Kelas XI SMA</p>
+
+                <!-- Identitas Terperinci -->
+                <div class="mt-4 p-4 bg-slate-50 rounded-xl max-w-md mx-auto text-left text-sm grid grid-cols-2 gap-2 border border-slate-200">
+                    <div><span class="text-slate-500">Nama:</span> <strong id="res-name" class="text-slate-800 block">-</strong></div>
+                    <div><span class="text-slate-500">Kelas / Absen:</span> <strong id="res-class" class="text-slate-800 block">-</strong></div>
+                    <div><span class="text-slate-500">Waktu Tempuh:</span> <strong id="res-time" class="text-slate-800 block">-</strong></div>
+                    <div><span class="text-slate-500">Status:</span> <strong id="res-status" class="text-emerald-600 block">-</strong></div>
+                </div>
+
+                <!-- Skor Display -->
+                <div class="my-6">
+                    <div class="text-5xl font-extrabold text-indigo-700" id="res-score">0</div>
+                    <p class="text-xs text-slate-500 mt-1 uppercase font-semibold tracking-wider">Nilai Akhir (Skala 100)</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto text-center text-xs">
+                    <div class="bg-emerald-50 p-2.5 rounded-lg border border-emerald-100">
+                        <span class="block font-bold text-emerald-700 text-base" id="res-correct">0</span>
+                        <span class="text-emerald-800">Benar</span>
+                    </div>
+                    <div class="bg-red-50 p-2.5 rounded-lg border border-red-100">
+                        <span class="block font-bold text-red-700 text-base" id="res-wrong">0</span>
+                        <span class="text-red-800">Salah</span>
+                    </div>
+                    <div class="bg-slate-100 p-2.5 rounded-lg border border-slate-200">
+                        <span class="block font-bold text-slate-700 text-base" id="res-empty">0</span>
+                        <span class="text-slate-800">Kosong</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rekapitulasi Pembahasan Soal -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 space-y-6 card-print">
+                <h3 class="text-lg font-bold text-slate-800 pb-3 border-b border-slate-100 flex items-center space-x-2">
+                    <i class="fa-solid fa-list-check text-indigo-600"></i>
+                    <span>Evaluasi & Kunci Jawaban Lengkap</span>
+                </h3>
+
+                <div id="review-container" class="space-y-6">
+                    <!-- Review Item via JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER PERMANEN -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center mt-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <p class="text-xs md:text-sm font-semibold text-slate-700">
+                Nazha Alyandra Ferdiansyah, S.Pd
+            </p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Guru Bahasa Indonesia • Media Pembelajaran Berbasis Digital SMA</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPT LOGIKA APLIKASI -->
+    <script>
+        // DATA 20 SOAL HOTS & KUNCI JAWABAN
+        const questionsData = [
+            {
+                id: 1,
+                text: `<b>Bacalah teks berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       Penggunaan gawai dalam pembelajaran sering dianggap menyebabkan peserta didik kehilangan konsentrasi. Namun, anggapan tersebut tidak selalu tepat. Dalam sebuah survei terhadap 300 peserta didik, 214 peserta didik menyatakan bahwa gawai membantu mereka menemukan sumber belajar yang tidak tersedia di buku teks. Di sisi lain, 86 peserta didik mengaku lebih mudah terdistraksi ketika pembelajaran tidak memiliki aturan penggunaan gawai yang jelas. Data tersebut menunjukkan bahwa persoalan utama bukan semata-mata keberadaan gawai, melainkan bagaimana perangkat tersebut digunakan dalam pembelajaran. Oleh sebab itu, sekolah perlu menetapkan aturan penggunaan gawai yang terarah.
+                       </div>
+                       Simpulan yang paling tepat berdasarkan struktur penalaran teks tersebut adalah ....`,
+                options: [
+                    "Gawai merupakan media pembelajaran terbaik karena sebagian besar peserta didik menggunakannya untuk mencari sumber belajar.",
+                    "Gawai tidak menyebabkan masalah konsentrasi selama peserta didik diperbolehkan menggunakannya secara bebas.",
+                    "Dampak penggunaan gawai dipengaruhi oleh cara penggunaannya sehingga diperlukan aturan yang mengarahkan pemanfaatannya.",
+                    "Peserta didik yang terdistraksi oleh gawai memiliki kemampuan belajar yang lebih rendah dibandingkan peserta didik lainnya.",
+                    "Sekolah seharusnya melarang penggunaan gawai karena 86 peserta didik mengalami gangguan konsentrasi."
+                ],
+                answer: 2, // Index C
+                explanation: "Teks menjelaskan bahwa dampak positif atau negatif dari gawai bergantung pada cara penggunaannya dan keberadaan aturan, sehingga simpulan paling representatif adalah C."
+            },
+            {
+                id: 2,
+                text: `<b>Perhatikan dua pernyataan berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 my-2 text-sm">
+                       <b>Pernyataan A:</b> Penggunaan media digital meningkatkan kualitas pembelajaran.<br>
+                       <b>Pernyataan B:</b> Dalam survei terhadap 250 peserta didik, 187 peserta didik menyatakan lebih mudah memahami materi ketika guru menggunakan media digital yang dilengkapi contoh visual.
+                       </div>
+                       Hubungan paling tepat antara kedua pernyataan tersebut adalah ....`,
+                options: [
+                    "A merupakan fakta yang dibuktikan oleh B.",
+                    "A merupakan kesimpulan/opini yang memperoleh dukungan berupa data pada B.",
+                    "B merupakan opini yang memperkuat fakta pada A.",
+                    "A dan B merupakan fakta yang kedudukannya sama.",
+                    "B merupakan sanggahan terhadap A."
+                ],
+                answer: 1, // Index B
+                explanation: "Pernyataan A merupakan sebuah opini/klaim umum, sedangkan pernyataan B menyajikan data hasil survei empiris yang berfungsi sebagai bukti pendukung."
+            },
+            {
+                id: 3,
+                text: `<b>Bacalah paragraf berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       (1) Budaya membaca perlu diperkuat di lingkungan sekolah. (2) Peserta didik yang terbiasa membaca memiliki lebih banyak kesempatan untuk menemukan kosakata dan informasi baru. (3) Selain itu, kegiatan membaca dapat melatih kemampuan peserta didik memahami gagasan dari berbagai sudut pandang. (4) Hasil evaluasi literasi sekolah menunjukkan bahwa kelas yang memiliki program membaca 15 menit sebelum pembelajaran memperoleh rata-rata skor pemahaman bacaan lebih tinggi daripada kelas yang tidak menjalankan program tersebut. (5) Dengan demikian, pembiasaan membaca tidak hanya penting sebagai kegiatan tambahan, tetapi juga dapat mendukung kemampuan memahami informasi.
+                       </div>
+                       Kalimat yang memiliki fungsi paling kuat sebagai bukti terhadap gagasan utama adalah ....`,
+                options: [
+                    "Kalimat pertama",
+                    "Kalimat kedua",
+                    "Kalimat ketiga",
+                    "Kalimat keempat",
+                    "Kalimat kelima"
+                ],
+                answer: 3, // Index D (Kalimat keempat)
+                explanation: "Kalimat (4) menyajikan data objektif berupa hasil evaluasi literasi sekolah yang dapat diukur secara empiris sebagai bukti nyata."
+            },
+            {
+                id: 4,
+                text: `<b>Perhatikan kutipan berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       Banyak peserta didik menganggap berita yang muncul di media sosial selalu benar karena berita tersebut telah dibagikan oleh banyak orang. Padahal, jumlah orang yang membagikan suatu informasi tidak dapat dijadikan ukuran kebenarannya. Informasi yang viral tetap perlu diperiksa sumber, waktu penerbitan, dan kesesuaiannya dengan fakta. Oleh karena itu, kemampuan mengevaluasi informasi digital menjadi bagian penting dari literasi peserta didik.
+                       </div>
+                       Pola pengembangan argumentasi yang paling dominan dalam paragraf tersebut adalah ....`,
+                options: [
+                    "perbandingan antara dua tokoh",
+                    "hubungan sebab-akibat dan penalaran",
+                    "kronologi suatu peristiwa",
+                    "penggambaran suatu objek",
+                    "klasifikasi berdasarkan karakteristik"
+                ],
+                answer: 1, // Index B
+                explanation: "Paragraf mengembangkan penalaran logis mengenai kekeliruan anggapan umum dan memberikan alasan konsekuensi (sebab-akibat) perlunya evaluasi informasi."
+            },
+            {
+                id: 5,
+                text: `<b>Seorang peserta didik menulis:</b><br>
+                       <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 my-2 text-sm font-mono text-amber-900">
+                       “Sebagian besar siswa kelas XI menggunakan media sosial setiap hari. Oleh karena itu, dapat dipastikan bahwa media sosial membuat seluruh siswa kelas XI malas membaca.”
+                       </div>
+                       Kesalahan penalaran yang paling tepat untuk mengkritik kalimat tersebut adalah ....`,
+                options: [
+                    "data yang digunakan terlalu banyak untuk mendukung argumen.",
+                    "simpulan yang dibuat terlalu luas dibandingkan bukti yang tersedia.",
+                    "penulis menggunakan konjungsi yang tidak sesuai.",
+                    "kalimat tersebut tidak memiliki subjek yang jelas.",
+                    "argumen tersebut tidak memiliki kata modalitas."
+                ],
+                answer: 1, // Index B
+                explanation: "Terjadi cacat logika generalisasi berlebihan (overgeneralization): premis hanya menyebut 'sebagian besar menggunakan media sosial', namun simpulan secara mutlak mengklaim 'seluruh siswa malas membaca'."
+            },
+            {
+                id: 6,
+                text: `<b>Perhatikan paragraf berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       Transportasi umum dapat menjadi salah satu solusi untuk mengurangi kemacetan. (1) Jumlah kendaraan pribadi di wilayah perkotaan terus bertambah setiap tahun. (2) Kondisi tersebut menyebabkan volume kendaraan di sejumlah ruas jalan semakin padat. (3) Transportasi umum yang aman, nyaman, dan terjangkau dapat mendorong masyarakat meninggalkan kendaraan pribadi. (4) Oleh karena itu, peningkatan kualitas transportasi umum perlu menjadi perhatian pemerintah.
+                       </div>
+                       Jika kalimat (2) dihilangkan, dampak paling signifikan terhadap hubungan argumentasi adalah ....`,
+                options: [
+                    "ide pokok berubah menjadi opini.",
+                    "hubungan antara pertambahan kendaraan dan perlunya alternatif transportasi menjadi kurang jelas.",
+                    "kalimat (3) kehilangan fungsi sebagai fakta.",
+                    "kalimat (4) tidak lagi dapat menjadi kalimat penutup.",
+                    "paragraf berubah dari induktif menjadi deduktif."
+                ],
+                answer: 1, // Index B
+                explanation: "Kalimat (2) berfungsi sebagai jembatan penalaran yang menghubungkan masalah bertambahnya kendaraan pribadi dengan akibat kemacetan sebelum masuk ke solusi transportasi umum."
+            },
+            {
+                id: 7,
+                text: `<b>Perhatikan data berikut!</b><br>
+                       <div class="overflow-x-auto my-3">
+                           <table class="min-w-full text-xs text-left border border-slate-200">
+                               <thead class="bg-slate-100 font-bold border-b">
+                                   <tr><th class="p-2 border-r">Kelas</th><th class="p-2 border-r">Mengikuti Program Membaca</th><th class="p-2">Rata-rata Skor Literasi</th></tr>
+                               </thead>
+                               <tbody>
+                                   <tr class="border-b"><td class="p-2 border-r font-semibold">XI A</td><td class="p-2 border-r">Ya</td><td class="p-2 font-bold text-emerald-600">82</td></tr>
+                                   <tr class="border-b"><td class="p-2 border-r font-semibold">XI B</td><td class="p-2 border-r">Ya</td><td class="p-2 font-bold text-emerald-600">84</td></tr>
+                                   <tr class="border-b"><td class="p-2 border-r font-semibold">XI C</td><td class="p-2 border-r">Tidak</td><td class="p-2 font-bold text-red-600">73</td></tr>
+                                   <tr><td class="p-2 border-r font-semibold">XI D</td><td class="p-2 border-r">Tidak</td><td class="p-2 font-bold text-red-600">75</td></tr>
+                               </tbody>
+                           </table>
+                       </div>
+                       Seorang siswa menyimpulkan: <i>“Program membaca pasti menyebabkan semua peserta didik mengalami peningkatan kemampuan literasi.”</i><br>
+                       Evaluasi terhadap simpulan tersebut adalah ....`,
+                options: [
+                    "tepat karena rata-rata kelas yang mengikuti program lebih tinggi.",
+                    "tepat karena seluruh data menunjukkan hubungan langsung antara program dan kemampuan literasi.",
+                    "kurang tepat karena data menunjukkan perbedaan rata-rata, tetapi belum cukup untuk memastikan hubungan sebab-akibat secara mutlak.",
+                    "salah karena data tidak boleh digunakan dalam teks argumentasi.",
+                    "salah karena rata-rata skor tidak dapat digunakan sebagai bukti."
+                ],
+                answer: 2, // Index C
+                explanation: "Data menunjukkan korelasi positif pada rata-rata kelas, namun klaim bahwa program 'pasti menyebabkan semua siswa meningkat secara mutlak' terlalu overclaim."
+            },
+            {
+                id: 8,
+                text: `<b>Perhatikan argumen berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       Sekolah seharusnya menyediakan lebih banyak buku cetak karena buku cetak lebih baik daripada buku digital. Buku cetak tidak membutuhkan baterai, sehingga pasti membuat peserta didik lebih fokus. Semua peserta didik yang membaca buku digital cenderung terdistraksi oleh internet.
+                       </div>
+                       Pernyataan evaluasi yang paling tepat adalah ....`,
+                options: [
+                    "Argumen kuat karena seluruh pernyataannya menggunakan fakta.",
+                    "Argumen lemah karena terdapat generalisasi dan hubungan sebab-akibat yang belum didukung bukti memadai.",
+                    "Argumen kuat karena buku cetak tidak membutuhkan baterai.",
+                    "Argumen lemah hanya karena menggunakan kata “seharusnya”.",
+                    "Argumen kuat karena membandingkan buku cetak dan digital."
+                ],
+                answer: 1, // Index B
+                explanation: "Argumen ini lemah karena melakukan asumsi berlebihan ('pasti lebih fokus') dan mempergeneralisasi semua pembaca buku digital pasti terdistraksi."
+            },
+            {
+                id: 9,
+                text: `<b>Seorang siswa ingin mendukung pendapat:</b> <i>“Sekolah perlu meningkatkan kegiatan literasi digital.”</i><br>
+                       Ia menemukan lima data berikut:
+                       <ol class="list-decimal list-inside text-xs space-y-1 my-2 bg-slate-100 p-3 rounded-lg">
+                           <li>Banyak peserta didik menyukai penggunaan internet.</li>
+                           <li><b>Sebanyak 64% peserta didik pernah menerima informasi yang kemudian diketahui tidak benar.</b></li>
+                           <li>Sebagian peserta didik menggunakan media sosial untuk hiburan.</li>
+                           <li>Guru sering menggunakan komputer dalam pembelajaran.</li>
+                           <li>Sebagian peserta didik memiliki lebih dari satu akun media sosial.</li>
+                       </ol>
+                       Data yang paling kuat dan relevan untuk mendukung pendapat tersebut adalah ....`,
+                options: ["1", "2", "3", "4", "5"],
+                answer: 1, // Index B (Data 2)
+                explanation: "Data nomor 2 memberikan angka konkret mengenai kerentanan siswa terhadap hoax (64%), yang menjadi urgensi utama perlunya literasi digital."
+            },
+            {
+                id: 10,
+                text: `<b>Bacalah dua argumen berikut!</b><br>
+                       <div class="space-y-2 my-2 text-xs">
+                           <div class="p-2.5 bg-slate-100 rounded border"><b>Argumen I:</b> Sekolah perlu menyediakan lebih banyak ruang terbuka hijau karena lingkungan yang hijau terlihat lebih indah.</div>
+                           <div class="p-2.5 bg-indigo-50 rounded border border-indigo-200"><b>Argumen II:</b> Sekolah perlu menyediakan lebih banyak ruang terbuka hijau. Selain menciptakan lingkungan belajar yang lebih nyaman, keberadaan vegetasi dapat membantu mengurangi panas di lingkungan sekolah. Oleh karena itu, penambahan ruang terbuka hijau layak dipertimbangkan sebagai bagian dari upaya menciptakan lingkungan belajar yang nyaman.</div>
+                       </div>
+                       Argumen II dianggap lebih kuat terutama karena ....`,
+                options: [
+                    "menggunakan kata-kata yang lebih panjang.",
+                    "memiliki lebih banyak kalimat.",
+                    "memberikan alasan yang memiliki hubungan logis dengan pendapat.",
+                    "menggunakan istilah yang lebih sulit.",
+                    "tidak mengandung opini."
+                ],
+                answer: 2, // Index C
+                explanation: "Argumen II tidak hanya mengandalkan aspek estetis (keindahan), tetapi memberikan alasan fungsional yang logis dan relevan dengan kenyamanan belajar."
+            },
+            {
+                id: 11,
+                text: `<b>Perhatikan kutipan berikut!</b><br>
+                       <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 my-2 text-sm italic text-amber-950">
+                       “Pemerintah harus melarang seluruh penggunaan kendaraan pribadi di kota karena kendaraan pribadi menyebabkan kemacetan. Jika kendaraan pribadi dilarang, maka kemacetan pasti akan hilang.”
+                       </div>
+                       Kritik paling mendasar terhadap argumen tersebut adalah ....`,
+                options: [
+                    "pendapat tidak boleh menggunakan modalitas “harus”.",
+                    "penulis tidak memberikan data mengenai jumlah kendaraan.",
+                    "penulis menganggap satu kebijakan pasti menyelesaikan persoalan kompleks tanpa mempertimbangkan faktor lain.",
+                    "kendaraan pribadi tidak pernah menyebabkan kemacetan.",
+                    "konjungsi “karena” tidak dapat digunakan dalam teks argumentasi."
+                ],
+                answer: 2, // Index C
+                explanation: "Argumen ini terjebak dalam simplifikasi berlebihan (oversimplification) dengan mengabaikan variabel kemacetan lain seperti infrastruktur jalan, angkutan umum, dan tata kota."
+            },
+            {
+                id: 12,
+                text: `<b>Perhatikan kalimat berikut!</b><br>
+                       <div class="bg-slate-100 p-2.5 rounded border italic text-sm my-2">
+                       “Menurut saya, penggunaan video dalam pembelajaran sangat efektif karena video itu menarik.”
+                       </div>
+                       Jika Anda bertindak sebagai editor teks argumentasi, revisi yang paling meningkatkan kualitas argumentasi adalah ....`,
+                options: [
+                    "“Menurut saya, penggunaan video sangat, sangat efektif karena menarik.”",
+                    "“Penggunaan video sangat efektif karena semua siswa pasti menyukainya.”",
+                    "“Penggunaan video dalam pembelajaran dapat membantu pemahaman materi apabila disertai penjelasan yang sesuai, sebagaimana ditunjukkan oleh hasil evaluasi pembelajaran pada beberapa kelas.”",
+                    "“Video sangat menarik dan sangat bagus digunakan dalam pembelajaran.”",
+                    "“Saya yakin video adalah media terbaik untuk semua pembelajaran.”"
+                ],
+                answer: 2, // Index C
+                explanation: "Opsi C mengubah klaim subjektif menjadi kalimat bernalar objektif yang melengkapi argumen dengan syarat efektivitas dan bukti evaluasi."
+            },
+            {
+                id: 13,
+                text: `<b>Perhatikan paragraf berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       Penggunaan media pembelajaran interaktif perlu ditingkatkan. Media interaktif membuat pembelajaran menjadi menyenangkan. <span class="underline font-semibold bg-amber-100">Peserta didik pasti lebih pintar jika belajar menggunakan media interaktif.</span> Oleh karena itu, semua guru wajib menggunakan media interaktif dalam setiap pembelajaran.
+                       </div>
+                       Bagian yang paling perlu dievaluasi agar argumentasi tersebut tidak mengalami klaim berlebihan adalah ....`,
+                options: [
+                    "“Penggunaan media pembelajaran interaktif perlu ditingkatkan.”",
+                    "“Media interaktif membuat pembelajaran menjadi menyenangkan.”",
+                    "“Peserta didik pasti lebih pintar jika belajar menggunakan media interaktif.”",
+                    "“Oleh karena itu, semua guru...”",
+                    "Seluruh paragraf karena tidak memiliki kata konjungsi."
+                ],
+                answer: 2, // Index C
+                explanation: "Klaim 'pasti lebih pintar' merupakan bentuk pemutlakan tanpa bukti terukur yang nyata, sehingga tergolong klaim berlebihan (overclaim)."
+            },
+            {
+                id: 14,
+                text: `<b>Perhatikan data dan simpulan berikut!</b><br>
+                       <div class="bg-slate-100 p-3 rounded-lg text-xs space-y-1 my-2 border">
+                           <div><b>Data:</b> Dari 400 peserta didik, 280 peserta didik menyatakan lebih menyukai pembelajaran yang menggunakan media visual.</div>
+                           <div><b>Simpulan:</b> “Semua peserta didik lebih memahami materi jika pembelajaran menggunakan media visual.”</div>
+                       </div>
+                       Evaluasi paling tepat adalah ....`,
+                options: [
+                    "simpulan tepat karena mayoritas peserta didik menyukai media visual.",
+                    "simpulan tepat karena jumlah responden cukup banyak.",
+                    "simpulan terlalu luas karena data hanya menunjukkan preferensi sebagian responden, bukan pemahaman seluruh peserta didik.",
+                    "simpulan salah karena data kuantitatif tidak boleh digunakan.",
+                    "simpulan tepat karena menyukai media visual berarti memahami materi."
+                ],
+                answer: 2, // Index C
+                explanation: "Menyukai (preferensi) tidak sama dengan tingkat pemahaman nyata. Selain itu, menyimpulkan 'semua' berdasarkan preferensi sebagian responden adalah logika salah."
+            },
+            {
+                id: 15,
+                text: `<b>Perhatikan paragraf berikut!</b><br>
+                       <div class="bg-slate-50 p-3.5 rounded-lg border-l-4 border-indigo-500 my-2 text-sm italic">
+                       Membaca berita dari sumber tepercaya penting dilakukan peserta didik. Berita dari sumber tepercaya pasti selalu benar. Oleh karena itu, peserta didik tidak perlu memeriksa kembali informasi yang terdapat dalam berita tersebut.
+                       </div>
+                       Perbaikan paling tepat terhadap logika argumentasi tersebut adalah ....`,
+                options: [
+                    "mengganti semua kata “berita” dengan “informasi”.",
+                    "menghapus kalimat pertama.",
+                    "mengubah klaim mutlak dan menambahkan pentingnya verifikasi informasi.",
+                    "menambahkan kata “sangat” pada setiap kalimat.",
+                    "mengganti “oleh karena itu” dengan “namun”."
+                ],
+                answer: 2, // Index C
+                explanation: "Sikap kritis memerlukan verifikasi/silang balik informasi. Klaim bahwa sumber tepercaya 'pasti selalu benar tanpa perlu dicek' berbahaya dalam literasi informasi."
+            },
+            {
+                id: 16,
+                text: `<b>Anda diminta menyusun paragraf argumentasi berdasarkan data berikut:</b><br>
+                       <div class="p-2 bg-indigo-50 text-indigo-900 rounded font-semibold text-xs my-2 border border-indigo-200">
+                       72% dari 250 peserta didik mengaku pernah memperoleh informasi palsu melalui media sosial.
+                       </div>
+                       Pilihan paragraf yang paling memenuhi prinsip argumentasi adalah ....`,
+                options: [
+                    "Media sosial sangat berbahaya. Banyak siswa menggunakannya setiap hari. Semua informasi di media sosial tidak dapat dipercaya.",
+                    "Media sosial harus dilarang bagi peserta didik karena sebagian besar informasi di dalamnya palsu. Oleh karena itu, siswa tidak boleh menggunakan media sosial.",
+                    "Kemampuan literasi digital perlu diperkuat karena peserta didik berhadapan dengan berbagai informasi di media sosial. Berdasarkan survei terhadap 250 peserta didik, 72% mengaku pernah memperoleh informasi palsu melalui media sosial. Data tersebut menunjukkan pentingnya kemampuan memeriksa sumber dan kebenaran informasi sebelum mempercayainya.",
+                    "Media sosial adalah bagian dari kehidupan peserta didik. Media sosial digunakan untuk belajar dan hiburan. Banyak siswa memiliki akun media sosial.",
+                    "Peserta didik sebaiknya berhati-hati menggunakan media sosial karena media sosial sangat berbahaya dan penuh informasi palsu."
+                ],
+                answer: 2, // Index C
+                explanation: "Paragraf C memiliki struktur argumentasi lengkap: Pendapat (Tesis), Integrasi Data Empiris secara akurat, serta Penegasan Ulang yang objektif."
+            },
+            {
+                id: 17,
+                text: `<b>Perhatikan gagasan berikut:</b><br>
+                       <div class="bg-slate-100 p-3 rounded-lg text-xs space-y-1 my-2 border">
+                           <div>• <b>Pendapat:</b> Sekolah perlu memperkuat budaya membaca.</div>
+                           <div>• <b>Alasan:</b> Membaca membantu peserta didik memahami informasi.</div>
+                           <div>• <b>Bukti:</b> Program membaca 15 menit berkaitan dengan skor literasi yang lebih tinggi.</div>
+                           <div>• <b>Penegasan:</b> Program membaca perlu dilakukan secara konsisten.</div>
+                       </div>
+                       Kalimat yang paling tepat untuk menggabungkan seluruh unsur tersebut menjadi argumentasi adalah ....`,
+                options: [
+                    "Sekolah perlu memperkuat budaya membaca. Membaca bagus. Program membaca juga bagus. Oleh karena itu, membaca harus dilakukan.",
+                    "Sekolah perlu memperkuat budaya membaca karena kegiatan tersebut membantu peserta didik memahami informasi. Hasil evaluasi menunjukkan bahwa kelas yang menjalankan program membaca 15 menit memiliki skor literasi lebih tinggi. Oleh karena itu, program membaca perlu diterapkan secara konsisten.",
+                    "Membaca adalah kegiatan penting. Semua siswa harus membaca karena membaca sangat bermanfaat bagi kehidupan.",
+                    "Program membaca 15 menit dilakukan oleh beberapa kelas. Skor literasi mereka tinggi. Sekolah memiliki budaya membaca.",
+                    "Membaca dapat meningkatkan kemampuan peserta didik. Oleh karena itu, semua siswa pasti menjadi lebih pintar jika membaca."
+                ],
+                answer: 1, // Index B
+                explanation: "Opsi B berhasil menyatukan tesis, alasan logis, bukti empiris, dan penegasan ulang dalam satu kesatuan paragraf yang padu dan koheren."
+            },
+            {
+                id: 18,
+                text: `<b>Anda menemukan data berikut:</b><br>
+                       <div class="p-2.5 bg-slate-100 rounded border text-xs my-2">
+                       80% peserta didik menyatakan pembelajaran menggunakan infografis membuat informasi lebih mudah dipahami, tetapi 20% lainnya menyatakan tidak mengalami perbedaan.
+                       </div>
+                       Kalimat argumentasi yang paling objektif berdasarkan data tersebut adalah ....`,
+                options: [
+                    "Infografis terbukti efektif untuk seluruh peserta didik.",
+                    "Infografis merupakan satu-satunya media yang efektif dalam pembelajaran.",
+                    "Sebagian besar peserta didik dalam survei menyatakan infografis membantu memahami informasi, meskipun tidak semua peserta didik merasakan manfaat yang sama.",
+                    "Semua peserta didik yang tidak menyukai infografis memiliki kemampuan memahami informasi yang rendah.",
+                    "Guru wajib menggunakan infografis karena 80% peserta didik menyukainya."
+                ],
+                answer: 2, // Index C
+                explanation: "Opsi C bersifat paling objektif karena mengakomodasi fakta mayoritas (80%) sekaligus menghargai data minoritas (20%) tanpa manipulasi klaim."
+            },
+            {
+                id: 19,
+                text: `<b>Susunlah kalimat berikut menjadi paragraf argumentasi yang paling logis!</b><br>
+                       <div class="bg-slate-50 p-3 rounded-lg text-xs space-y-1.5 my-2 border">
+                           <div>(1) Kondisi tersebut menunjukkan perlunya kemampuan peserta didik dalam memeriksa kredibilitas sumber informasi.</div>
+                           <div>(2) Peserta didik saat ini memperoleh informasi dari berbagai platform digital.</div>
+                           <div>(3) Tidak semua informasi yang beredar di platform tersebut dapat dipertanggungjawabkan kebenarannya.</div>
+                           <div>(4) Oleh karena itu, literasi digital perlu menjadi bagian penting dalam pembelajaran.</div>
+                           <div>(5) Kemampuan tersebut membantu peserta didik membedakan informasi yang dapat dipercaya dan yang perlu diverifikasi.</div>
+                       </div>
+                       Urutan yang paling tepat adalah ....`,
+                options: [
+                    "2 – 3 – 1 – 5 – 4",
+                    "3 – 2 – 5 – 1 – 4",
+                    "2 – 5 – 3 – 1 – 4",
+                    "5 – 1 – 2 – 3 – 4",
+                    "2 – 3 – 5 – 4 – 1"
+                ],
+                answer: 0, // Index A (2-3-1-5-4)
+                explanation: "Urutan logis: (2) Konteks awal -> (3) Permasalahan -> (1) Implikasi/Kebutuhan -> (5) Manfaat kemampuan -> (4) Kesimpulan akhir/Rekomendasi."
+            },
+            {
+                id: 20,
+                text: `<b>Anda akan menulis teks argumentasi dengan tesis:</b><br>
+                       <div class="p-2.5 bg-indigo-50 border border-indigo-200 rounded text-indigo-900 text-xs font-semibold my-2">
+                       “Penggunaan media digital dalam pembelajaran perlu dilakukan secara terarah, bukan sekadar diperbanyak.”
+                       </div>
+                       Manakah rancangan argumentasi yang paling matang dan logis?`,
+                options: [
+                    "Media digital menarik → peserta didik menyukai teknologi → teknologi adalah masa depan → media digital harus digunakan sebanyak mungkin.",
+                    "Media digital membantu menyajikan materi → semua peserta didik pasti menyukainya → sekolah harus menggunakan media digital dalam semua pembelajaran.",
+                    "Media digital dapat memperkaya sumber dan bentuk penyajian materi → efektivitasnya bergantung pada tujuan dan cara penggunaannya → data hasil pembelajaran digunakan untuk menilai manfaatnya → sekolah perlu mengarahkan penggunaan media digital sesuai kebutuhan pembelajaran.",
+                    "Peserta didik menggunakan gawai → gawai memiliki banyak aplikasi → aplikasi dapat digunakan untuk belajar → semua pembelajaran harus berbasis gawai.",
+                    "Media digital berkembang pesat → sekolah harus mengikuti perkembangan → guru harus menggunakan media digital → pembelajaran akan menjadi modern."
+                ],
+                answer: 2, // Index C
+                explanation: "Opsi C menyusun alur penalaran kritis, mulai dari potensi media, syarat efektivitas, tolok ukur evaluasi, hingga kesimpulan rekomendasi terarah."
+            }
+        ];
+
+        // STATE APLIKASI
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // { questionId: selectedOptionIndex }
+        let timerInterval = null;
+        let timeRemaining = 45 * 60; // 45 menit
+        let studentData = {};
+
+        // INI FUNGSI MEMULAI UJIAN
+        function startExam(e) {
+            e.preventDefault();
+            
+            // Simpan data siswa (Kelas diisi mandiri)
+            studentData = {
+                name: document.getElementById('student-name').value,
+                class: document.getElementById('student-class').value,
+                number: document.getElementById('student-number').value
+            };
+
+            // Berpindah Tampilan
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            document.getElementById('screen-quiz').classList.add('grid');
+            document.getElementById('header-timer').classList.remove('hidden');
+            document.getElementById('header-timer').classList.add('flex');
+
+            // Render Navigasi & Soal Pertama
+            renderQuestionGrid();
+            loadQuestion(0);
+
+            // Jalankan Timer
+            startTimer();
+        }
+
+        // TIMER
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                let mins = Math.floor(timeRemaining / 60);
+                let secs = timeRemaining % 60;
+                document.getElementById('timer-display').innerText = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Waktu ujian telah habis!");
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        // LOAD SOAL
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questionsData[index];
+
+            document.getElementById('question-number-title').innerText = `Soal No. ${index + 1} dari ${questionsData.length}`;
+            document.getElementById('question-content').innerHTML = q.text;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D', 'E'];
+
+            q.options.forEach((optText, optIdx) => {
+                const isSelected = userAnswers[q.id] === optIdx;
+                const optionBtn = document.createElement('div');
+                
+                optionBtn.className = `p-3.5 md:p-4 rounded-xl border-2 cursor-pointer transition flex items-start space-x-3 ${
+                    isSelected 
+                    ? 'border-indigo-600 bg-indigo-50/60 shadow-sm' 
+                    : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
+                }`;
+
+                optionBtn.onclick = () => selectOption(q.id, optIdx);
+
+                optionBtn.innerHTML = `
+                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold ${
+                        isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300 text-slate-500'
+                    }">
+                        ${optionLabels[optIdx]}
+                    </div>
+                    <div class="text-xs md:text-sm text-slate-700 leading-relaxed pt-0.5">${optText}</div>
+                `;
+
+                optionsContainer.appendChild(optionBtn);
+            });
+
+            // Update state tombol prev/next
+            document.getElementById('btn-prev').disabled = (index === 0);
+            
+            const nextBtn = document.getElementById('btn-next');
+            if (index === questionsData.length - 1) {
+                nextBtn.innerHTML = `<span>Selesai Ujian</span> <i class="fa-solid fa-check ml-1"></i>`;
+                nextBtn.className = "px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-lg shadow transition";
+                nextBtn.onclick = confirmFinish;
+            } else {
+                nextBtn.innerHTML = `<span>Berikutnya</span> <i class="fa-solid fa-chevron-right ml-1"></i>`;
+                nextBtn.className = "px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow transition";
+                nextBtn.onclick = () => changeQuestion(1);
+            }
+
+            updateGridState();
+        }
+
+        // PILIH JAWABAN
+        function selectOption(qId, optIdx) {
+            userAnswers[qId] = optIdx;
+            loadQuestion(currentQuestionIndex);
+            updateGridState();
+        }
+
+        // NAVIGASI TOMBOL PREV / NEXT
+        function changeQuestion(direction) {
+            let targetIndex = currentQuestionIndex + direction;
+            if (targetIndex >= 0 && targetIndex < questionsData.length) {
+                loadQuestion(targetIndex);
+            }
+        }
+
+        // RENDER GRID NAVIGASI
+        function renderQuestionGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = '';
+
+            questionsData.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${idx}`;
+                btn.className = 'h-9 text-xs font-semibold rounded-lg transition border flex items-center justify-center';
+                btn.innerText = idx + 1;
+                btn.onclick = () => loadQuestion(idx);
+                grid.appendChild(btn);
+            });
+
+            updateGridState();
+        }
+
+        // UPDATE WARNA GRID
+        function updateGridState() {
+            let answeredCount = 0;
+
+            questionsData.forEach((q, idx) => {
+                const btn = document.getElementById(`grid-btn-${idx}`);
+                if (!btn) return;
+
+                const isAnswered = userAnswers[q.id] !== undefined;
+                const isCurrent = currentQuestionIndex === idx;
+
+                if (isAnswered) answeredCount++;
+
+                if (isCurrent) {
+                    btn.className = 'h-9 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-100 text-indigo-900 shadow-sm';
+                } else if (isAnswered) {
+                    btn.className = 'h-9 text-xs font-semibold rounded-lg bg-emerald-500 text-white border-emerald-600';
+                } else {
+                    btn.className = 'h-9 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200';
+                }
+            });
+
+            document.getElementById('answered-count-badge').innerText = `${answeredCount}/${questionsData.length} Terjawab`;
+        }
+
+        // KONFIRMASI SELESAI
+        function confirmFinish() {
+            const totalAnswered = Object.keys(userAnswers).length;
+            const unAnswered = questionsData.length - totalAnswered;
+
+            let msg = `Apakah Anda yakin ingin menyelesaikan ujian?`;
+            if (unAnswered > 0) {
+                msg = `Masih ada ${unAnswered} soal yang belum dijawab. ` + msg;
+            }
+
+            if (confirm(msg)) {
+                finishExam();
+            }
+        }
+
+        // PROSES HASIL AKHIR
+        function finishExam() {
+            clearInterval(timerInterval);
+
+            // Hitung Skor
+            let correctCount = 0;
+            questionsData.forEach(q => {
+                if (userAnswers[q.id] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const score = (correctCount / questionsData.length) * 100;
+            const wrongCount = Object.keys(userAnswers).length - correctCount;
+            const emptyCount = questionsData.length - Object.keys(userAnswers).length;
+
+            // Hitung durasi pengerjaan
+            const timeSpentSeconds = (45 * 60) - timeRemaining;
+            const spentMins = Math.floor(timeSpentSeconds / 60);
+            const spentSecs = timeSpentSeconds % 60;
+
+            // Render Ringkasan Diri
+            document.getElementById('res-name').innerText = studentData.name;
+            document.getElementById('res-class').innerText = `${studentData.class} (Absen ${studentData.number})`;
+            document.getElementById('res-time').innerText = `${spentMins} Menit ${spentSecs} Detik`;
+            document.getElementById('res-score').innerText = Math.round(score);
+            document.getElementById('res-correct').innerText = correctCount;
+            document.getElementById('res-wrong').innerText = wrongCount;
+            document.getElementById('res-empty').innerText = emptyCount;
+
+            const resStatus = document.getElementById('res-status');
+            if (score >= 75) {
+                resStatus.innerText = "Tuntas / Lulus KKTP";
+                resStatus.className = "text-emerald-600 font-bold block";
+            } else {
+                resStatus.innerText = "Perlu Remedial";
+                resStatus.className = "text-amber-600 font-bold block";
+            }
+
+            // Render Pembahasan
+            renderReviewList();
+
+            // Pindah Layar
+            document.getElementById('screen-quiz').classList.remove('grid');
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('header-timer').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // RENDER PEMBAHASAN DETIL
+        function renderReviewList() {
+            const container = document.getElementById('review-container');
+            container.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D', 'E'];
+
+            questionsData.forEach((q, idx) => {
+                const userAnsIdx = userAnswers[q.id];
+                const isCorrect = userAnsIdx === q.answer;
+                const isUnanswered = userAnsIdx === undefined;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `p-4 md:p-5 rounded-xl border ${
+                    isCorrect ? 'border-emerald-200 bg-emerald-50/30' : 'border-red-200 bg-red-50/30'
+                } space-y-3`;
+
+                let statusBadge = isCorrect 
+                    ? `<span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Benar (+5)</span>`
+                    : `<span class="bg-red-100 text-red-800 text-xs px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i> ${isUnanswered ? 'Tidak Dijawab' : 'Salah'} (0)</span>`;
+
+                itemDiv.innerHTML = `
+                    <div class="flex justify-between items-start border-b border-slate-200/60 pb-2">
+                        <span class="font-bold text-slate-800 text-sm">Soal Nomor ${idx + 1}</span>
+                        ${statusBadge}
+                    </div>
+                    <div class="text-xs md:text-sm text-slate-800 leading-relaxed">${q.text}</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs pt-1">
+                        <div class="p-2.5 rounded-lg border ${isCorrect ? 'bg-emerald-100/50 border-emerald-200 text-emerald-900' : 'bg-red-100/50 border-red-200 text-red-900'}">
+                            <span class="font-semibold block mb-0.5">Jawaban Anda:</span>
+                            ${isUnanswered ? '<i>(Tidak dijawab)</i>' : `<b>${optionLabels[userAnsIdx]}.</b> ${q.options[userAnsIdx]}`}
+                        </div>
+                        <div class="p-2.5 rounded-lg border bg-indigo-50 border-indigo-200 text-indigo-950">
+                            <span class="font-semibold block mb-0.5 text-indigo-900">Kunci Jawaban Tepat:</span>
+                            <b>${optionLabels[q.answer]}.</b> ${q.options[q.answer]}
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-1">
+                        <span class="font-bold text-indigo-700 block"><i class="fa-solid fa-lightbulb mr-1"></i> Pembahasan Analisis:</span>
+                        <p>${q.explanation}</p>
+                    </div>
+                `;
+
+                container.appendChild(itemDiv);
+            });
+        }
+    </script>
+</body>
+</html>
